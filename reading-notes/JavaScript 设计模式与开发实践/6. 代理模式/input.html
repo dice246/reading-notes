@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<input type="checkbox" class="file" id="1">1
+<input type="checkbox" class="file" id="2">2
+<input type="checkbox" class="file" id="3">3
+<input type="checkbox" class="file" id="4">4
+<input type="checkbox" class="file" id="5">5
+<input type="checkbox" class="file" id="6">6
+<input type="checkbox" class="file" id="7">7
+<input type="checkbox" class="file" id="8">8
+<input type="checkbox" class="file" id="9">9
+<input type="checkbox" class="file" id="10">10
+<script>
+  // 本体
+  function file(id) {
+    console.log(`同步文件, id: ${id}`)
+  }
+
+  // 代理
+  let proxyFile = (function () {
+  	let cache = [], timer;
+
+  	return (id) => {
+  		cache.push(id);
+
+  		if (timer) {
+  			return false;
+      }
+
+      timer = setTimeout(() => {
+      	file(cache.join(','));
+      	timer = null;
+      	cache.length = 0;
+      }, 2000)
+    }
+  })()
+
+  let checkbox = document.querySelectorAll('.file')
+
+  for (let i =0, c; c = checkbox[i++];) {
+  	c.addEventListener('click', function () {
+      // this.checked && file(this.id)
+      this.checked && proxyFile(this.id)
+	  })
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<script>
+	/**
+   * 过滤请求
+	 * @constructor
+	 */
+  let Flower = function () {
+    console.log('flower...')
+  }
+
+  let xiaoming = {
+  	sendFlower (target) {
+  		target.receiveFlower()
+    }
+  }
+
+  let proxy = {
+  	receiveFlower() {
+  		God.listenGood(() => {
+  			let flower = new Flower();  // 虚拟代理，延迟对象的创建
+  			God.receiveFlower(flower);
+      })
+    }
+  }
+
+  let God = {
+  	receiveFlower(flower) {
+  		console.log(`receive ${flower}`)
+    },
+    listenGood (fn) {
+  		setTimeout(() => {
+  			fn();
+      }, 2000)
+    }
+  }
+
+  xiaoming.sendFlower(proxy)
+</script>
+</body>
+</html>

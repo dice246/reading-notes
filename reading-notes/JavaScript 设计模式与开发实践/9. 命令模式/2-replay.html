@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<button id="replay">replay</button>
+<script>
+	let ryu = {
+		attack () {
+			console.log('attack...')
+		},
+		defense () {
+			console.log('defense...')
+		},
+		jump () {
+			console.log('jump...')
+		},
+		crouch () {
+			console.log('crouch...')
+		}
+	}
+
+	let makeCommand = function (receiver, state) {
+		return function () {
+			receiver[state]()
+		}
+	}
+
+	let commands = {
+		'a': 'jump',
+		's': 'crouch',
+		'd': 'defense',
+		'f': 'attack'
+	}
+
+	let commandStack = [];
+
+  document.onkeypress = function (e) {
+    let keyCode = e.key;
+    let command = makeCommand(ryu, commands[keyCode])
+
+    if (command) {
+    	command();
+    	commandStack.push(command)
+    }
+  }
+
+  document.querySelector('#replay').addEventListener('click', function () {
+  	let command;
+
+    while (command = commandStack.shift()) {
+    	command();
+    }
+  })
+</script>
+</body>
+</html>

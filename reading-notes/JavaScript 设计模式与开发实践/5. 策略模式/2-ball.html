@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    .ball {
+      width: 100px;
+      height: 100px;
+      line-height: 100px;
+      border-radius: 50%;
+      text-align: center;
+      background: pink;
+      position: absolute;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <button class="btn">click</button>
+  <div class="ball">
+    ball
+  </div>
+<script>
+  // 缓动动画
+	const tween = {
+		linear: function( t, b, c, d ){ // t: 动画已消耗的时间 b:原始位置 c: 目标位置 d: 动画持续的总时间
+			return c*t/d + b;
+    },
+		easeIn: function( t, b, c, d ){
+			return c * ( t /= d ) * t + b;
+		},
+		strongEaseIn: function(t, b, c, d){
+			return c * ( t /= d ) * t * t * t * t + b;
+		},
+		strongEaseOut: function(t, b, c, d){
+			return c * ( ( t = t / d - 1) * t * t * t * t + 1 ) + b;
+		},
+		sineaseIn: function( t, b, c, d ){
+			return c * ( t /= d) * t * t + b;
+    },
+		sineaseOut: function(t,b,c,d){
+			return c * ( ( t = t / d - 1) * t * t + 1 ) + b;
+		}
+	};
+
+	let Animal = function (dom) {
+    this.dom = dom;
+    this.startTime = 0;
+    this.startPos = 0;
+    this.endPos = 0;
+    this.propertyName = null;
+    this.easing = null;
+    this.duration = null;
+	}
+
+	Animal.prototype.start = function (propertyName, endPos, duration, easing) {
+    this.startTime = +new Date;
+		this.propertyName = propertyName;
+    this.startPos = this.dom.getBoundingClientRect()[propertyName];
+    this.endPos = endPos;
+    this.duration = duration;
+    this.easing = tween[easing];
+
+    let timeId = setInterval(() => {
+    	if (!this.step()) {
+    		clearInterval(timeId)
+      }
+    }, 19)
+	}
+
+	Animal.prototype.step = function () {
+    let t = +new Date;
+    if (t >= this.startTime + this.duration) {
+    	this.update(this.endPos)
+      return false;
+    }
+
+    let pos = this.easing(t - this.startTime, this.startPos, this.endPos - this.startPos, this.duration);
+    this.update(pos)
+    return true;
+	}
+
+	Animal.prototype.update = function (pos) {
+		console.log(this.propertyName)
+    this.dom.style[this.propertyName] = pos + 'px'
+	}
+
+	let ball = document.querySelector('.ball');
+	let btn = document.querySelector('.btn');
+	let a = new Animal(ball);
+
+  btn.addEventListener('click', function () {
+      a.start('left', 400, 1000, 'strongEaseIn')
+	})
+</script>
+</body>
+</html>

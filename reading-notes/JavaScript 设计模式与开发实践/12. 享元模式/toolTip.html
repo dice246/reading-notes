@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<script>
+  let toolTipFactory = (function () {
+    let toolTipPool = []
+    let id = 0;
+
+    return {
+    	create () {
+    		if (toolTipPool.length) {
+    			return toolTipPool.shift();
+        } else {
+    			let div = document.createElement('div');
+    			document.body.appendChild(div)
+          div.innerHTML = id++
+
+          return div;
+        }
+      },
+      recover (dom) {
+    		toolTipPool.push(dom)
+
+        console.log(toolTipPool)
+      }
+    }
+  })();
+
+  let ary = [];
+
+  // 创建
+  for (let i = 0, str; str = ['a', 'b'][i++];) {
+  	let toolTip = toolTipFactory.create();
+  	ary.push(toolTip)
+  }
+
+  ary.map((item) => {
+  	toolTipFactory.recover(item)
+  })
+
+  for (let i = 0, str; str = ['a', 'b', 'c', 'd', 'e'][i++];) {
+  	toolTipFactory.create();
+  }
+</script>
+</body>
+</html>

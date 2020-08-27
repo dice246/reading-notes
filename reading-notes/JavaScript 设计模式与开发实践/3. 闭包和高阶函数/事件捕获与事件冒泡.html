@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    .outer {
+      margin: 0 auto;
+      width: 200px;
+      height: 200px;
+      background: antiquewhite;
+      text-align: center;
+    }
+
+    .inner {
+      margin: 50px;
+      width: 100px;
+      height: 100px;
+      background: aqua;
+    }
+  </style>
+</head>
+<body>
+  <div class="outer">
+    outer
+    <div class="inner">
+      inner
+    </div>
+  </div>
+  <script>
+    let outer = document.querySelector('.outer')
+    let inner = document.querySelector('.inner')
+
+    /**
+     * target.addEventListener(type, listener[, useCapture]);
+     * useCapture: boolean (true: 捕获阶段触发  false: 冒泡阶段触发（默认值）)
+     * 如果target(目标元素)上既有捕获也有冒泡事件，按照注册的顺序执行
+     */
+    outer.addEventListener('click', function () {
+      console.log(`注册事件1： outer事件冒泡`)
+    })
+
+    inner.addEventListener('click', function () {
+	    console.log('注册事件2： inner事件冒泡')
+    }, false)
+
+    outer.addEventListener('click', function () {
+	    console.log('注册事件3： outer事件捕获')
+    }, true)
+
+    inner.addEventListener('click', function () {
+	    console.log('注册事件4：inner事件捕获')
+    }, true)
+
+    inner.addEventListener('click', function () {
+	    console.log('注册事件5：inner事件捕获')
+    }, true)
+
+    inner.addEventListener('click', function () {
+	    console.log('注册事件6：inner事件冒泡')
+    })
+
+    // 结果
+    // 注册事件3： outer事件捕获
+    // 注册事件2： inner事件冒泡
+    // 注册事件4：inner事件捕获
+    // 注册事件5：inner事件捕获
+    // 注册事件6：inner事件冒泡
+    // 注册事件1： outer事件冒泡
+  </script>
+</body>
+</html>

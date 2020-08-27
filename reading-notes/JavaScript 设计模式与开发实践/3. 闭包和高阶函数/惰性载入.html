@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<button id="btn">click</button>
+<script>
+	/**
+   * 优点： 没有多余的执行，（如果没有调用addEvent，不会执行）
+	 * @param elem
+	 * @param type
+	 * @param handler
+	 */
+  let addEvent = function (elem, type, handler) {
+    if (window.addEventListener) {
+	    addEvent = function (elem, type, handler) {
+        elem.addEventListener(type, handler)
+	    }
+    } else {
+	    addEvent = function (elem, type, handler) {
+        elem.attachEvent('on' + type, handler)
+	    }
+    }
+
+    addEvent(elem, type, handler)
+  }
+
+  addEvent(document.querySelector('#btn'), 'click', function () {
+    alert(1)
+  })
+
+</script>
+</body>
+</html>

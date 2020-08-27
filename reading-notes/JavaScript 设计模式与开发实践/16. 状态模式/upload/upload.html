@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<script>
+  // 插件上传
+  let plugin = (function () {
+    let plugin = document.createElement('embed');
+
+    plugin.style.display = 'none';
+    plugin.type = 'application/txftn-webkit';
+
+    plugin.sign = () => {
+    	console.log('扫描文件...')
+    }
+
+    plugin.pause = () => {
+    	console.log('暂停...')
+    }
+
+    plugin.uploading = () => {
+    	console.log('开始上传...')
+    }
+
+    plugin.del = () => {
+    	console.log('删除文件...')
+    }
+
+    plugin.done = () => {
+    	console.log('上传完毕...')
+    }
+
+    document.body.appendChild(plugin);
+
+    return plugin;
+  })();
+
+  // 上传
+  let Upload = function (fileName) {
+    this.fileName = fileName;
+    this.plugin = plugin;
+    this.btn1 = null;
+    this.btn2 = null;
+    this.signState = new SignState(this);
+    this.uploadingState = new UploadingState(this);
+    this.pauseState = new PauseState(this);
+    this.doneState = new DoneState(this);
+    this.errorState = new ErrorState(this);
+    this.currentState = this.signState;
+  }
+
+  Upload.prototype.init = function () {
+    this.dom = document.createElement('div');
+    this.dom.innerHTML = `
+      <span>文件名称：${this.fileName}</span>
+      <button class="btn1">扫描中</button>
+      <button class="btn2">删除</button>
+    `;
+
+    document.body.appendChild(this.dom);
+
+    this.btn1 = this.dom.querySelector('.btn1');
+    this.btn2 = this.dom.querySelector('.btn2');
+
+    this.bindEvent();
+  }
+
+  Upload.prototype.bindEvent = function () {
+    this.btn1.addEventListener('click', () => {
+    	this.currentState.clickBtn1();
+    });
+
+    this.btn2.addEventListener('click', () => {
+    	this.currentState.clickBtn2();
+    })
+  };
+
+  // 以下都是行为
+  Upload.prototype.sign = function () {
+  	this.currentState = this.signState;
+    this.plugin.sign();
+  }
+
+  Upload.prototype.pause = function () {
+  	this.btn1.innerHTML = '暂停，点击继续上传';
+    this.currentState = this.pauseState;
+    this.plugin.pause();
+  }
+
+  Upload.prototype.uploading = function () {
+    this.btn1.innerHTML = '正在上传，点击暂停';
+    this.currentState = this.uploadingState;
+    this.plugin.uploading();
+  }
+
+  Upload.prototype.done = function () {
+  	this.btn1.innerHTML = '上传完成';
+    this.currentState = this.doneState;
+    this.plugin.done();
+  }
+
+  Upload.prototype.error = function () {
+    this.currentState = this.errorState;
+    this.btn1.innerHTML = '上传失败';
+  }
+
+  Upload.prototype.del = function () {
+    this.plugin.del();
+    this.dom.parentNode.removeChild(this.dom);
+  }
+
+  // 状态工厂
+  let StateFactory = (function () {
+    let State = function () {};
+
+    State.prototype.clickBtn1 = function () {
+      throw new Error('子类必须重写父类')
+    }
+
+	  State.prototype.clickBtn2 = function () {
+		  throw new Error('子类必须重写父类')
+	  }
+
+	  return function (params) {
+      let F = function (uploadObj) {
+        this.uploadObj = uploadObj;
+      }
+
+      F.prototype = Object.create(State.prototype);
+
+      for (let i in params) {
+      	F.prototype[i] = params[i]
+      }
+
+      return F;
+	  }
+  })();
+
+  let SignState = StateFactory({
+    clickBtn1: function () {
+      console.log('扫描中，点击无效')
+    },
+    clickBtn2: function () {
+      console.log('扫描中，不能删除')
+    }
+  });
+
+  let UploadingState = StateFactory({
+    clickBtn1: function () {
+      this.uploadObj.pause();
+    },
+    clickBtn2: function () {
+      console.log('上传中，不能删除')
+    }
+  });
+
+  let PauseState = StateFactory({
+    clickBtn1: function () {
+      this.uploadObj.uploading();
+    },
+    clickBtn2: function () {
+      this.uploadObj.del();
+    }
+  });
+
+  let DoneState = StateFactory({
+    clickBtn1: function () {
+      console.log('上传完成，点击无效');
+    },
+    clickBtn2: function () {
+      this.uploadObj.del();
+    }
+  });
+
+  let ErrorState = StateFactory({
+    clickBtn1: function () {
+      console.log('上传出错')
+    },
+    clickBtn2: function () {
+      this.uploadObj.del();
+    }
+  })
+
+
+  let upload = new Upload('JS设计模式与开发实践');
+  upload.init();
+
+  window.upload = function (state) {
+    upload[state]();
+  }
+
+  window.upload('sign')
+
+
+  setTimeout(() => {
+  	window.upload('uploading')
+  }, 1000)
+
+  setTimeout(() => {
+	  window.upload('done')
+  }, 5000)
+</script>
+</body>
+</html>

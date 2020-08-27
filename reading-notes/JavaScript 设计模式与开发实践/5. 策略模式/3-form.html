@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<form action="" id="registerForm">
+  <label for="name">
+    <input type="text" id="name" name="name" placeholder="请输入用户名">
+  </label>
+  <label for="password">
+    <input type="text" id="password" name="password" placeholder="请输入密码">
+  </label>
+  <input type="submit" value="提交">
+</form>
+<script>
+  // 策略类
+  const strategies = {
+  	isNonEmpty (val, err) {
+  		if (val === '') {
+  			return err
+      }
+    },
+    minLength (val, len, err) {
+  		if (val.length < len) {
+  			return err
+      }
+    }
+  }
+
+  // 验证类
+  let Vali = function () {
+    this.cache = []
+  }
+
+  Vali.prototype.add = function (dom ,rules) {
+    for (let i = 0, rule; rule = rules[i++];) {
+    	let strategyArr = rule.strategy.split(':');
+    	let err = rule.err;
+
+    	this.cache.push(() => {
+    		let strategy = strategyArr.shift(); // 获取策略类的方法
+        strategyArr.unshift(dom.value);
+        strategyArr.push(err)
+
+        return strategies[strategy].apply(dom, strategyArr)
+      })
+    }
+  }
+
+  Vali.prototype.start = function () {
+    for(let i = 0, valiFunc; valiFunc = this.cache[i++];) {
+    	let err = valiFunc();
+
+    	if (err) {
+    		return err;
+      }
+    }
+  }
+
+
+  // 业务代码
+  let form = document.querySelector('#registerForm');
+
+  let valiFunc = function () {
+    let v = new Vali();
+
+    v.add(form.name, [{
+    	strategy: 'isNonEmpty',
+      err: '不能为空'
+    }, {
+    	strategy: 'minLength: 6',
+      err: '长度不能小于6位'
+    }]);
+
+	  v.add(form.password, [{
+		  strategy: 'isNonEmpty',
+		  err: '不能为空'
+	  }, {
+		  strategy: 'minLength: 8',
+		  err: '长度不能小于8位'
+	  }]);
+
+	  let err = v.start();
+	  return err;
+  }
+
+  form.addEventListener('submit', function () {
+    let err = valiFunc();
+
+    if (err) {
+    	alert(err)
+      return false;
+    } else {
+    	alert('success')
+    }
+  })
+</script>
+</body>
+</html>

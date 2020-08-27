@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<script>
+	/**
+   * 虚拟代理
+	 */
+	let myImg = (function () {
+    let imgNode = document.createElement('img')
+    document.body.appendChild(imgNode)
+
+    return (src) => {
+    	imgNode.src = src
+    }
+  })()
+
+  // 代理
+  let proxyImg = (function () {
+    let img = new Image
+
+    img.onload = function () {
+      myImg(this.src)
+    }
+
+    return (src) => {
+    	myImg('https://res.iqianjin.com/images/loading.gif')
+      img.src = src
+    }
+  })()
+
+  proxyImg('https://res.iqianjin.com/images/common/sprite/sp1-new/sp1-new.png')
+</script>
+</body>
+</html>
