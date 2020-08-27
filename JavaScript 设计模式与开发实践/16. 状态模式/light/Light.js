@@ -1,6 +1,6 @@
 const OffLightState = require('./OffLightState');
 const WeakLightState = require('./WeakLightState');
-const StrongLightState = require('./STrongLightState');
+const StrongLightState = require('./StrongLightState');
 
 class Light {
 	constructor() {
